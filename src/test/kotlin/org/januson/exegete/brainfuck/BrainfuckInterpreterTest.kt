@@ -29,7 +29,17 @@ class BrainfuckInterpreterTest {
 
         val interpreter = BrainfuckInterpreter(memory)
         interpreter.interpret(">")
-        
+
         assertEquals(interpreter.pointer, 1)
+    }
+
+    @Test
+    fun movesPointerToLeft() {
+        val memory = 2048
+
+        val interpreter = BrainfuckInterpreter(memory)
+        interpreter.interpret("<")
+
+        assertEquals(interpreter.pointer, -1)
     }
 }

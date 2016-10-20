@@ -23,6 +23,7 @@ class BrainfuckInterpreter(val memorySize: Int) {
         println(command)
         when(command) {
             '>' -> pointer++
+            '<' -> pointer--
         }
     }
 }
