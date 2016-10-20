@@ -12,14 +12,18 @@ class BrainfuckInterpreter(val memorySize: Int) {
     }
 
     private val memory = ByteArray(memorySize)
-    private var pointer = 0
+    var pointer = 0
+        private set
 
     fun interpret(code: String) {
         code.forEach { interpret(it) }
     }
 
-    private fun interpret(instruction: Char) {
-        println(instruction)
+    private fun interpret(command: Char) {
+        println(command)
+        when(command) {
+            '>' -> pointer++
+        }
     }
 }
 

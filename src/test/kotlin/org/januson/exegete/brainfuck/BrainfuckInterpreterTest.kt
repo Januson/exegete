@@ -22,4 +22,14 @@ class BrainfuckInterpreterTest {
         val memory = 0
         BrainfuckInterpreter(memory)
     }
+
+    @Test
+    fun movesPointerToRight() {
+        val memory = 2048
+
+        val interpreter = BrainfuckInterpreter(memory)
+        interpreter.interpret(">")
+        
+        assertEquals(interpreter.pointer, 1)
+    }
 }
