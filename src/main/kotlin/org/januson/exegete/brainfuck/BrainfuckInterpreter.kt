@@ -22,7 +22,12 @@ class BrainfuckInterpreter(val memorySize: Int) {
     private fun interpret(command: Char) {
         println(command)
         when(command) {
-            '>' -> pointer++
+            '>' -> {
+                if (pointer == memorySize) {
+                    throw PointerOutOfBoundsException()
+                }
+                pointer++
+            }
             '<' -> pointer--
         }
     }
