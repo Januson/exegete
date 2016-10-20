@@ -16,4 +16,10 @@ class BrainfuckInterpreterTest {
 
         assertEquals(interpreter.memorySize, memory)
     }
+
+    @Test(expectedExceptions = arrayOf(IllegalArgumentException::class))
+    fun cannotCreateInterpreterWithZeroMemory() {
+        val memory = 0
+        BrainfuckInterpreter(memory)
+    }
 }

@@ -5,6 +5,12 @@ package org.januson.exegete.brainfuck
  */
 class BrainfuckInterpreter(val memorySize: Int) {
 
+    init {
+        if (memorySize <= 0) {
+            throw IllegalArgumentException("Allocated memory must be greater then zero")
+        }
+    }
+
     private val memory = ByteArray(memorySize)
     private var pointer = 0
 
