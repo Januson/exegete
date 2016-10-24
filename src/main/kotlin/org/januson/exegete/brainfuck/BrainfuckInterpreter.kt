@@ -21,19 +21,19 @@ class BrainfuckInterpreter(val memorySize: Int) {
 
     private fun interpret(command: Char) {
         println(command)
-        when(command) {
+        when (command) {
             '>' -> {
                 if (pointer == memorySize) {
                     throw PointerOutOfBoundsException()
                 }
                 pointer++
             }
-            '<' -> pointer--
+            '<' -> {
+                if (pointer == 0) {
+                    throw PointerOutOfBoundsException()
+                }
+                pointer--
+            }
         }
     }
-}
-
-fun main(args: Array<String>) {
-    val interpreter = BrainfuckInterpreter(2048)
-    interpreter.interpret("+++++>>>")
 }

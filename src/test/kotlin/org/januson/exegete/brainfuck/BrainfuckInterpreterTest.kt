@@ -44,10 +44,20 @@ class BrainfuckInterpreterTest {
     @Test
     fun movesPointerToLeft() {
         val memory = 1
+        val interpreter = BrainfuckInterpreter(memory)
+        interpreter.interpret(">")
+        assertEquals(interpreter.pointer, 1)
+
+        interpreter.interpret("<")
+
+        assertEquals(interpreter.pointer, 0)
+    }
+
+    @Test(expectedExceptions = arrayOf(PointerOutOfBoundsException::class))
+    fun failsToMovePointerLowerThanZero() {
+        val memory = 1
 
         val interpreter = BrainfuckInterpreter(memory)
         interpreter.interpret("<")
-
-        assertEquals(interpreter.pointer, -1)
     }
 }
