@@ -19,6 +19,7 @@ class BrainfuckInterpreter(val memorySize: Int, val printer: PrintStream) {
 
     fun interpret(code: String) {
         code.forEach { interpret(it) }
+        printer.flush()
     }
 
     private fun interpret(command: Char) {
@@ -35,10 +36,18 @@ class BrainfuckInterpreter(val memorySize: Int, val printer: PrintStream) {
                 }
                 pointer--
             }
+            '+' -> {
+                memory[pointer]++
+            }
             '.' -> {
                 printer.write(memory[pointer].toInt())
-                printer.flush()
             }
         }
     }
+}
+
+fun main(args: Array<String>) {
+    val bf = BrainfuckInterpreter(8, System.out)
+    val a = "+".repeat(97)
+    bf.interpret("%s.>%s+.>%s++.%n".format(a, a, a))
 }

@@ -1,13 +1,12 @@
 package org.januson.exegete.brainfuck
 
-import org.testng.Assert.*
+import org.testng.Assert.assertEquals
+import org.testng.Assert.assertFalse
 import org.testng.annotations.Test
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 
-/**
- * Created by januson on 10/15/16.
- */
+
 class BrainfuckInterpreterTest {
     private val writer = System.out
 
@@ -72,7 +71,17 @@ class BrainfuckInterpreterTest {
 
         interpreter.interpret(".")
 
-        assertEquals(interpreter.pointer, 0)
         assertFalse(writer.toString() == "")
+    }
+
+    @Test
+    fun increasesValueOfCurrentMemoryCellByNinetySeven() {
+        val memory = 1
+        val writer = ByteArrayOutputStream()
+        val interpreter = BrainfuckInterpreter(memory, PrintStream(writer))
+
+        interpreter.interpret("+".repeat(97) + ".")
+
+        assertEquals(writer.toString(), "a")
     }
 }
