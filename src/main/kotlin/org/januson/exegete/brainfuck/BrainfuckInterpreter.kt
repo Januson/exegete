@@ -11,6 +11,7 @@ class BrainfuckInterpreter(val memorySize: Int, val output: PrintStream, val rea
     private val memory = ByteArray(memorySize)
     var pointer = 0
         private set
+    private var index = 0
 
     init {
         if (memorySize <= 0) {
@@ -19,11 +20,16 @@ class BrainfuckInterpreter(val memorySize: Int, val output: PrintStream, val rea
     }
 
     fun interpret(code: String) {
-        code.forEach { interpret(it) }
+        index = 0
+        while (index < code.length) {
+            interpret(index, code)
+            index++
+        }
         output.flush()
     }
 
-    private fun interpret(command: Char) {
+    private fun interpret(i: Int, code: String) {
+        val command = code[i]
         when (command) {
             '>' -> {
                 if (pointer == memorySize) {
@@ -48,6 +54,22 @@ class BrainfuckInterpreter(val memorySize: Int, val output: PrintStream, val rea
             }
             ',' -> {
                 memory[pointer] = reader.nextByte()
+            }
+            '[' -> {
+                if (memory[pointer] == 0.toByte()) {
+                    var level = 1
+                    for (c in code.substring(i + 1)) {
+                        index++
+                        if (c == '[') {
+                            level++
+                        } else if (c == ']') {
+                            level--
+                        }
+                        if (level == 0) {
+                            return
+                        }
+                    }
+                }
             }
         }
     }

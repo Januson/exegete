@@ -112,4 +112,26 @@ class BrainfuckInterpreterTest {
 
         assertEquals(writer.toString(), "i")
     }
+
+    @Test
+    fun skipsBehindCorrespondingRightBracket() {
+        val memory = 1
+        val writer = ByteArrayOutputStream()
+        val interpreter = BrainfuckInterpreter(memory, PrintStream(writer), reader)
+
+        interpreter.interpret("[>>>]")
+
+        assertEquals(interpreter.pointer, 0)
+    }
+
+    @Test
+    fun skipsBehindCorrespondingRightBracketWithNestedBrackets() {
+        val memory = 1
+        val writer = ByteArrayOutputStream()
+        val interpreter = BrainfuckInterpreter(memory, PrintStream(writer), reader)
+
+        interpreter.interpret("[>[>>++[++++]]>>]")
+
+        assertEquals(interpreter.pointer, 0)
+    }
 }
