@@ -1,9 +1,11 @@
 package org.januson.exegete.brainfuck
 
+import java.io.PrintStream
+
 /**
  * Created by Januson on 13.10.2016.
  */
-class BrainfuckInterpreter(val memorySize: Int) {
+class BrainfuckInterpreter(val memorySize: Int, val printer: PrintStream) {
 
     init {
         if (memorySize <= 0) {
@@ -20,7 +22,6 @@ class BrainfuckInterpreter(val memorySize: Int) {
     }
 
     private fun interpret(command: Char) {
-        println(command)
         when (command) {
             '>' -> {
                 if (pointer == memorySize) {
@@ -33,6 +34,10 @@ class BrainfuckInterpreter(val memorySize: Int) {
                     throw PointerOutOfBoundsException()
                 }
                 pointer--
+            }
+            '.' -> {
+                printer.write(memory[pointer].toInt())
+                printer.flush()
             }
         }
     }
