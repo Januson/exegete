@@ -1,11 +1,16 @@
 package org.januson.exegete.brainfuck
 
 import java.io.PrintStream
+import java.util.*
 
 /**
  * Created by Januson on 13.10.2016.
  */
-class BrainfuckInterpreter(val memorySize: Int, val printer: PrintStream) {
+class BrainfuckInterpreter(val memorySize: Int, val output: PrintStream, val reader: Scanner) {
+
+    private val memory = ByteArray(memorySize)
+    var pointer = 0
+        private set
 
     init {
         if (memorySize <= 0) {
@@ -13,13 +18,9 @@ class BrainfuckInterpreter(val memorySize: Int, val printer: PrintStream) {
         }
     }
 
-    private val memory = ByteArray(memorySize)
-    var pointer = 0
-        private set
-
     fun interpret(code: String) {
         code.forEach { interpret(it) }
-        printer.flush()
+        output.flush()
     }
 
     private fun interpret(command: Char) {
@@ -39,15 +40,15 @@ class BrainfuckInterpreter(val memorySize: Int, val printer: PrintStream) {
             '+' -> {
                 memory[pointer]++
             }
+            '-' -> {
+                memory[pointer]--
+            }
             '.' -> {
-                printer.write(memory[pointer].toInt())
+                output.write(memory[pointer].toInt())
+            }
+            ',' -> {
+                memory[pointer] = reader.nextByte()
             }
         }
     }
-}
-
-fun main(args: Array<String>) {
-    val bf = BrainfuckInterpreter(8, System.out)
-    val a = "+".repeat(97)
-    bf.interpret("%s.>%s+.>%s++.%n".format(a, a, a))
 }

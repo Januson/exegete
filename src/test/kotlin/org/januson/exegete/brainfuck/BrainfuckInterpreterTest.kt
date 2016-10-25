@@ -1,20 +1,24 @@
 package org.januson.exegete.brainfuck
 
+import org.mockito.Mockito.`when`
+import org.mockito.Mockito.mock
 import org.testng.Assert.assertEquals
 import org.testng.Assert.assertFalse
 import org.testng.annotations.Test
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
+import java.util.*
 
 
 class BrainfuckInterpreterTest {
     private val writer = System.out
+    private val reader = Scanner(System.`in`)
 
     @Test
     fun createsBrainfuckInterpreterInstance() {
         val memory = 1
 
-        val interpreter = BrainfuckInterpreter(memory, writer)
+        val interpreter = BrainfuckInterpreter(memory, writer, reader)
 
         assertEquals(interpreter.memorySize, memory)
     }
@@ -22,14 +26,14 @@ class BrainfuckInterpreterTest {
     @Test(expectedExceptions = arrayOf(IllegalArgumentException::class))
     fun cannotCreateInterpreterWithZeroMemory() {
         val memory = 0
-        BrainfuckInterpreter(memory, writer)
+        BrainfuckInterpreter(memory, writer, reader)
     }
 
     @Test
     fun movesPointerToRight() {
         val memory = 1
 
-        val interpreter = BrainfuckInterpreter(memory, writer)
+        val interpreter = BrainfuckInterpreter(memory, writer, reader)
         interpreter.interpret(">")
 
         assertEquals(interpreter.pointer, 1)
@@ -39,14 +43,14 @@ class BrainfuckInterpreterTest {
     fun failsToMovePointerPastMemorySize() {
         val memory = 1
 
-        val interpreter = BrainfuckInterpreter(memory, writer)
+        val interpreter = BrainfuckInterpreter(memory, writer, reader)
         interpreter.interpret(">>")
     }
 
     @Test
     fun movesPointerToLeft() {
         val memory = 1
-        val interpreter = BrainfuckInterpreter(memory, writer)
+        val interpreter = BrainfuckInterpreter(memory, writer, reader)
         interpreter.interpret(">")
         assertEquals(interpreter.pointer, 1)
 
@@ -59,15 +63,37 @@ class BrainfuckInterpreterTest {
     fun failsToMovePointerLowerThanZero() {
         val memory = 1
 
-        val interpreter = BrainfuckInterpreter(memory, writer)
+        val interpreter = BrainfuckInterpreter(memory, writer, reader)
         interpreter.interpret("<")
+    }
+
+    @Test
+    fun increasesValueOfCurrentMemoryCellByNinetySeven() {
+        val memory = 1
+        val writer = ByteArrayOutputStream()
+        val interpreter = BrainfuckInterpreter(memory, PrintStream(writer), reader)
+
+        interpreter.interpret("+".repeat(97) + ".")
+
+        assertEquals(writer.toString(), "a")
+    }
+
+    @Test
+    fun decreasesValueOfCurrentMemoryCellByTwo() {
+        val memory = 1
+        val writer = ByteArrayOutputStream()
+        val interpreter = BrainfuckInterpreter(memory, PrintStream(writer), reader)
+        interpreter.interpret("+".repeat(100))
+
+        interpreter.interpret("--.")
+        assertEquals(writer.toString(), "b")
     }
 
     @Test
     fun returnsValueOfCurrentMemoryCell() {
         val memory = 1
         val writer = ByteArrayOutputStream()
-        val interpreter = BrainfuckInterpreter(memory, PrintStream(writer))
+        val interpreter = BrainfuckInterpreter(memory, PrintStream(writer), reader)
 
         interpreter.interpret(".")
 
@@ -75,13 +101,15 @@ class BrainfuckInterpreterTest {
     }
 
     @Test
-    fun increasesValueOfCurrentMemoryCellByNinetySeven() {
+    fun writesUserInputToCurrentMemoryCell() {
         val memory = 1
         val writer = ByteArrayOutputStream()
-        val interpreter = BrainfuckInterpreter(memory, PrintStream(writer))
+        val reader = mock(Scanner::class.java)
+        `when`(reader.nextByte()).thenReturn(105)
+        val interpreter = BrainfuckInterpreter(memory, PrintStream(writer), reader)
 
-        interpreter.interpret("+".repeat(97) + ".")
+        interpreter.interpret(",.")
 
-        assertEquals(writer.toString(), "a")
+        assertEquals(writer.toString(), "i")
     }
 }
