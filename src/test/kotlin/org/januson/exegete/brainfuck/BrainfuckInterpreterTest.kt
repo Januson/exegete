@@ -31,7 +31,7 @@ class BrainfuckInterpreterTest {
 
     @Test
     fun movesPointerToRight() {
-        val memory = 1
+        val memory = 2
 
         val interpreter = BrainfuckInterpreter(memory, writer, reader)
         interpreter.interpret(">")
@@ -44,12 +44,12 @@ class BrainfuckInterpreterTest {
         val memory = 1
 
         val interpreter = BrainfuckInterpreter(memory, writer, reader)
-        interpreter.interpret(">>")
+        interpreter.interpret(">")
     }
 
     @Test
     fun movesPointerToLeft() {
-        val memory = 1
+        val memory = 2
         val interpreter = BrainfuckInterpreter(memory, writer, reader)
         interpreter.interpret(">")
         assertEquals(interpreter.pointer, 1)
@@ -133,5 +133,17 @@ class BrainfuckInterpreterTest {
         interpreter.interpret("[>[>>++[++++]]>>]")
 
         assertEquals(interpreter.pointer, 0)
+    }
+
+    @Test
+    fun returnsToCorrespondingLeftBracket() {
+        val memory = 2
+        val writer = ByteArrayOutputStream()
+        val interpreter = BrainfuckInterpreter(memory, PrintStream(writer), reader)
+        interpreter.interpret(">" + "+".repeat(97) + "<")
+
+        interpreter.interpret("++[->.+<]")
+
+        assertEquals(writer.toString(), "ab")
     }
 }

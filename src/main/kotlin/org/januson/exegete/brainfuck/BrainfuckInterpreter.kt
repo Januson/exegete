@@ -32,7 +32,7 @@ class BrainfuckInterpreter(val memorySize: Int, val output: PrintStream, val rea
         val command = code[i]
         when (command) {
             '>' -> {
-                if (pointer == memorySize) {
+                if (pointer == memorySize - 1) {
                     throw PointerOutOfBoundsException()
                 }
                 pointer++
@@ -71,6 +71,28 @@ class BrainfuckInterpreter(val memorySize: Int, val output: PrintStream, val rea
                     }
                 }
             }
+            ']' -> {
+                if (memory[pointer] > 0.toByte()) {
+                    var level = 1
+                    for (c in code.substring(0, i).reversed()) {
+                        index--
+                        if (c == ']') {
+                            level++
+                        } else if (c == '[') {
+                            level--
+                        }
+                        if (level == 0) {
+                            return
+                        }
+                    }
+                }
+            }
         }
     }
+}
+
+fun main(args: Array<String>) {
+    val bf = BrainfuckInterpreter(1, System.out, Scanner(System.`in`))
+    bf.interpret(">")
+    bf.interpret(".")
 }
