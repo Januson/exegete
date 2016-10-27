@@ -1,149 +1,140 @@
 package org.januson.exegete.brainfuck
 
-import org.mockito.Mockito.`when`
-import org.mockito.Mockito.mock
-import org.testng.Assert.assertEquals
-import org.testng.Assert.assertFalse
+import org.mockito.Mockito.*
+import org.testng.Assert.assertNotNull
+import org.testng.annotations.BeforeMethod
 import org.testng.annotations.Test
-import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import java.util.*
 
 
 class BrainfuckInterpreterTest {
-    private val writer = System.out
-    private val reader = Scanner(System.`in`)
+    private val tape = mock(BrainfuckTape::class.java)
+    private val writer = mock(PrintStream::class.java)
+    private val reader = mock(Scanner::class.java)
+    private var interpreter = BrainfuckInterpreter(tape, writer, reader)
+
+
+    @BeforeMethod
+    fun setUp() {
+        reset(tape, writer, reader)
+        interpreter = BrainfuckInterpreter(tape, writer, reader)
+    }
 
     @Test
     fun createsBrainfuckInterpreterInstance() {
-        val memory = 1
-
-        val interpreter = BrainfuckInterpreter(memory, writer, reader)
-
-        assertEquals(interpreter.memorySize, memory)
-    }
-
-    @Test(expectedExceptions = arrayOf(IllegalArgumentException::class))
-    fun cannotCreateInterpreterWithZeroMemory() {
-        val memory = 0
-        BrainfuckInterpreter(memory, writer, reader)
+        assertNotNull(interpreter)
     }
 
     @Test
-    fun movesPointerToRight() {
-        val memory = 2
+    fun movesTapePointerToRight() {
+        val code = ">"
+        interpreter.run(code)
 
-        val interpreter = BrainfuckInterpreter(memory, writer, reader)
-        interpreter.interpret(">")
-
-        assertEquals(interpreter.pointer, 1)
+        verify(tape, times(1)).next()
+        verifyNoMoreInteractions(tape, writer, reader)
     }
 
     @Test(expectedExceptions = arrayOf(PointerOutOfBoundsException::class))
-    fun failsToMovePointerPastMemorySize() {
-        val memory = 1
+    fun throwsExceptionWhenMovesPastTapeSize() {
+        val code = ">"
+        `when`(tape.next()).thenThrow(PointerOutOfBoundsException::class.java)
 
-        val interpreter = BrainfuckInterpreter(memory, writer, reader)
-        interpreter.interpret(">")
+        interpreter.run(code)
     }
 
     @Test
     fun movesPointerToLeft() {
-        val memory = 2
-        val interpreter = BrainfuckInterpreter(memory, writer, reader)
-        interpreter.interpret(">")
-        assertEquals(interpreter.pointer, 1)
+        val code = "<"
+        interpreter.run(code)
 
-        interpreter.interpret("<")
-
-        assertEquals(interpreter.pointer, 0)
+        verify(tape, times(1)).previous()
+        verifyNoMoreInteractions(tape, writer, reader)
     }
 
     @Test(expectedExceptions = arrayOf(PointerOutOfBoundsException::class))
-    fun failsToMovePointerLowerThanZero() {
-        val memory = 1
+    fun throwsExceptionWhenMovesLowerThanZero() {
+        val code = "<"
+        `when`(tape.previous()).thenThrow(PointerOutOfBoundsException::class.java)
 
-        val interpreter = BrainfuckInterpreter(memory, writer, reader)
-        interpreter.interpret("<")
+        interpreter.run(code)
     }
 
     @Test
-    fun increasesValueOfCurrentMemoryCellByNinetySeven() {
-        val memory = 1
-        val writer = ByteArrayOutputStream()
-        val interpreter = BrainfuckInterpreter(memory, PrintStream(writer), reader)
+    fun increasesValueOfCurrentMemoryCell() {
+        val repeat = 105
+        val code = "+".repeat(repeat)
 
-        interpreter.interpret("+".repeat(97) + ".")
+        interpreter.run(code)
 
-        assertEquals(writer.toString(), "a")
+        verify(tape, times(repeat)).increment()
+        verifyNoMoreInteractions(tape, writer, reader)
     }
 
     @Test
-    fun decreasesValueOfCurrentMemoryCellByTwo() {
-        val memory = 1
-        val writer = ByteArrayOutputStream()
-        val interpreter = BrainfuckInterpreter(memory, PrintStream(writer), reader)
-        interpreter.interpret("+".repeat(100))
+    fun decreasesValueOfCurrentMemoryCell() {
+        val repeat = 222
+        val code = "-".repeat(repeat)
 
-        interpreter.interpret("--.")
-        assertEquals(writer.toString(), "b")
+        interpreter.run(code)
+
+        verify(tape, times(repeat)).decrement()
+        verifyNoMoreInteractions(tape, writer, reader)
     }
 
     @Test
-    fun returnsValueOfCurrentMemoryCell() {
-        val memory = 1
-        val writer = ByteArrayOutputStream()
-        val interpreter = BrainfuckInterpreter(memory, PrintStream(writer), reader)
+    fun writesOutValueOfCurrentMemoryCell() {
+        val code = "."
 
-        interpreter.interpret(".")
+        interpreter.run(code)
 
-        assertFalse(writer.toString() == "")
+        verify(tape, times(1)).cell
+        verify(writer, times(1)).write(anyInt())
+        verify(writer, times(1)).flush()
+        verifyNoMoreInteractions(tape, writer, reader)
     }
 
     @Test
-    fun writesUserInputToCurrentMemoryCell() {
-        val memory = 1
-        val writer = ByteArrayOutputStream()
-        val reader = mock(Scanner::class.java)
-        `when`(reader.nextByte()).thenReturn(105)
-        val interpreter = BrainfuckInterpreter(memory, PrintStream(writer), reader)
+    fun readsUserInputToCurrentMemoryCell() {
+        val code = ","
+        `when`(reader.nextInt()).thenReturn(105)
 
-        interpreter.interpret(",.")
+        interpreter.run(code)
 
-        assertEquals(writer.toString(), "i")
+        verify(tape, times(1)).cell = anyInt()
+        verify(reader, times(1)).nextInt()
+        verifyNoMoreInteractions(tape, writer, reader)
     }
 
     @Test
     fun skipsBehindCorrespondingRightBracket() {
-        val memory = 1
-        val writer = ByteArrayOutputStream()
-        val interpreter = BrainfuckInterpreter(memory, PrintStream(writer), reader)
+        val code = "[+++]"
 
-        interpreter.interpret("[>>>]")
+        interpreter.run(code)
 
-        assertEquals(interpreter.pointer, 0)
+        verify(tape, times(1)).cell
+        verifyNoMoreInteractions(tape, writer, reader)
     }
 
     @Test
     fun skipsBehindCorrespondingRightBracketWithNestedBrackets() {
-        val memory = 1
-        val writer = ByteArrayOutputStream()
-        val interpreter = BrainfuckInterpreter(memory, PrintStream(writer), reader)
+        val code = "[>[>>++[++++]]>>]"
 
-        interpreter.interpret("[>[>>++[++++]]>>]")
+        interpreter.run(code)
 
-        assertEquals(interpreter.pointer, 0)
+        verify(tape, times(1)).cell
+        verifyNoMoreInteractions(tape, writer, reader)
     }
 
     @Test
     fun returnsToCorrespondingLeftBracket() {
-        val memory = 2
-        val writer = ByteArrayOutputStream()
-        val interpreter = BrainfuckInterpreter(memory, PrintStream(writer), reader)
-        interpreter.interpret(">" + "+".repeat(97) + "<")
+        val code = "[-]"
+        `when`(tape.cell).thenReturn(2, 1, 0)
 
-        interpreter.interpret("++[->.+<]")
+        interpreter.run(code)
 
-        assertEquals(writer.toString(), "ab")
+        verify(tape, times(3)).cell
+        verify(tape, times(2)).decrement()
+        verifyNoMoreInteractions(tape, writer, reader)
     }
 }

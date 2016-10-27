@@ -4,59 +4,44 @@ import java.io.PrintStream
 import java.util.*
 
 /**
- * Created by Januson on 13.10.2016.
+ * Class runs Brainfuck code provided as string.
  */
-class BrainfuckInterpreter(val memorySize: Int, val output: PrintStream, val reader: Scanner) {
+class BrainfuckInterpreter(val tape: BrainfuckTape, val output: PrintStream, val reader: Scanner) {
 
-    private val memory = ByteArray(memorySize)
-    var pointer = 0
-        private set
     private var index = 0
 
-    init {
-        if (memorySize <= 0) {
-            throw IllegalArgumentException("Allocated memory must be greater then zero")
-        }
-    }
-
-    fun interpret(code: String) {
+    fun run(code: String) {
         index = 0
         while (index < code.length) {
             interpret(index, code)
             index++
         }
-        output.flush()
     }
 
     private fun interpret(i: Int, code: String) {
         val command = code[i]
         when (command) {
             '>' -> {
-                if (pointer == memorySize - 1) {
-                    throw PointerOutOfBoundsException()
-                }
-                pointer++
+                tape.next()
             }
             '<' -> {
-                if (pointer == 0) {
-                    throw PointerOutOfBoundsException()
-                }
-                pointer--
+                tape.previous()
             }
             '+' -> {
-                memory[pointer]++
+                tape.increment()
             }
             '-' -> {
-                memory[pointer]--
+                tape.decrement()
             }
             '.' -> {
-                output.write(memory[pointer].toInt())
+                output.write(tape.cell)
+                output.flush()
             }
             ',' -> {
-                memory[pointer] = reader.nextByte()
+                tape.cell = reader.nextInt()
             }
             '[' -> {
-                if (memory[pointer] == 0.toByte()) {
+                if (tape.cell == 0) {
                     var level = 1
                     for (c in code.substring(i + 1)) {
                         index++
@@ -72,7 +57,7 @@ class BrainfuckInterpreter(val memorySize: Int, val output: PrintStream, val rea
                 }
             }
             ']' -> {
-                if (memory[pointer] > 0.toByte()) {
+                if (tape.cell > 0) {
                     var level = 1
                     for (c in code.substring(0, i).reversed()) {
                         index--
@@ -89,10 +74,4 @@ class BrainfuckInterpreter(val memorySize: Int, val output: PrintStream, val rea
             }
         }
     }
-}
-
-fun main(args: Array<String>) {
-    val bf = BrainfuckInterpreter(1, System.out, Scanner(System.`in`))
-    bf.interpret(">")
-    bf.interpret(".")
 }
