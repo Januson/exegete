@@ -3,13 +3,13 @@ package org.januson.exegete.brainfuck
 import org.testng.Assert.*
 import org.testng.annotations.Test
 
-class BrainfuckTapeTest {
+class BrainFuckTapeTest {
 
     @Test
     fun createsBrainfuckTapeInstanceWithGivenSize() {
         val memory = 1
 
-        val tape = BrainfuckTape(memory)
+        val tape = BrainFuckTape(memory)
 
         assertEquals(tape.size, memory)
     }
@@ -19,7 +19,7 @@ class BrainfuckTapeTest {
         val memory = 1
         val expected = 0
 
-        val tape = BrainfuckTape(memory)
+        val tape = BrainFuckTape(memory)
 
         assertEquals(tape.pointer, expected)
     }
@@ -28,14 +28,14 @@ class BrainfuckTapeTest {
     fun throwsExceptionWhenIllegalSizeIsProvided() {
         val memory = 0
 
-        BrainfuckTape(memory)
+        BrainFuckTape(memory)
     }
 
     @Test
     fun movesPointerToTheNextCell() {
         val memory = 2
         val expected = 1
-        val tape = BrainfuckTape(memory)
+        val tape = BrainFuckTape(memory)
 
         tape.next()
 
@@ -45,7 +45,7 @@ class BrainfuckTapeTest {
     @Test(expectedExceptions = arrayOf(PointerOutOfBoundsException::class))
     fun throwsExceptionWhenPointerMovesPastTapeSize() {
         val memory = 1
-        val tape = BrainfuckTape(memory)
+        val tape = BrainFuckTape(memory)
 
         tape.next()
     }
@@ -55,7 +55,7 @@ class BrainfuckTapeTest {
         val memory = 2
         val start = 1
         val expected = 0
-        val tape = BrainfuckTape(memory)
+        val tape = BrainFuckTape(memory)
         tape.next()
         assertEquals(tape.pointer, start)
 
@@ -67,7 +67,7 @@ class BrainfuckTapeTest {
     @Test(expectedExceptions = arrayOf(PointerOutOfBoundsException::class))
     fun throwsExceptionWhenPointerMovesPastZero() {
         val memory = 1
-        val tape = BrainfuckTape(memory)
+        val tape = BrainFuckTape(memory)
 
         tape.previous()
     }
@@ -77,7 +77,7 @@ class BrainfuckTapeTest {
         val memory = 1
         val expected = 0
 
-        val tape = BrainfuckTape(memory)
+        val tape = BrainFuckTape(memory)
 
         assertEquals(tape.cell, expected)
     }
@@ -86,7 +86,7 @@ class BrainfuckTapeTest {
     fun increasesValueOfFistMemoryCellByOne() {
         val memory = 1
         val expected = 1
-        val tape = BrainfuckTape(memory)
+        val tape = BrainFuckTape(memory)
 
         tape.increment()
 
@@ -97,7 +97,7 @@ class BrainfuckTapeTest {
     fun decreasesValueOfFistMemoryCellByOne() {
         val memory = 1
         val expected = 1
-        val tape = BrainfuckTape(memory)
+        val tape = BrainFuckTape(memory)
         tape.increment()
         tape.increment()
 
@@ -110,7 +110,7 @@ class BrainfuckTapeTest {
     fun resetSetsPointerToZero() {
         val memory = 3
         val expected = 0
-        val tape = BrainfuckTape(memory)
+        val tape = BrainFuckTape(memory)
         tape.next()
         tape.next()
 
@@ -123,7 +123,7 @@ class BrainfuckTapeTest {
     fun resetSetsAllMemoryCellsToZero() {
         val memory = 3
         val expected = 0
-        val tape = BrainfuckTape(memory)
+        val tape = BrainFuckTape(memory)
         tape.increment()
         tape.next()
         tape.increment()

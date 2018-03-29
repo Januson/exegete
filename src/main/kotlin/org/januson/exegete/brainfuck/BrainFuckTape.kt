@@ -6,7 +6,7 @@ package org.januson.exegete.brainfuck
  *
  * @param size of the memory's memory.
  */
-class BrainfuckTape(val size: Int) {
+class BrainFuckTape(val size: Int) : Tape {
 
     /**
      * An array of memory cells.
@@ -47,7 +47,7 @@ class BrainfuckTape(val size: Int) {
      *
      * @throws PointerOutOfBoundsException when pointer moves past memory size.
      */
-    fun next() {
+    override fun next() {
         if (pointer == size - 1) {
             throw PointerOutOfBoundsException()
         }
@@ -60,7 +60,7 @@ class BrainfuckTape(val size: Int) {
      *
      * @throws PointerOutOfBoundsException when pointer moves past zero
      */
-    fun previous() {
+    override fun previous() {
         if (pointer == 0) {
             throw PointerOutOfBoundsException()
         }
@@ -70,14 +70,14 @@ class BrainfuckTape(val size: Int) {
     /**
      * Increases value of memory cell currently pointed to by pointer by one.
      */
-    fun increment() {
+    override fun increment() {
         memory[pointer]++
     }
 
     /**
      * Decreases value of memory cell currently pointed to by pointer by one.
      */
-    fun decrement() {
+    override fun decrement() {
         memory[pointer]--
     }
 
